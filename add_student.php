@@ -26,7 +26,7 @@ $classQuery = mysqli_query($conn,
 
 $class = mysqli_fetch_assoc($classQuery);
 
-$invite_link = "http://localhost/attendance-system/join_class.php?code=" . $class['invite_code'];
+$invite_link = "http://localhost:8080/attendance-system/join_class.php?code=".$class['invite_code'];
 
 
 if(!$class){
@@ -294,21 +294,48 @@ Invite Link
 
 <div class="input-group">
 
-<input
-type="text"
+<input type="text"
 id="inviteLink"
 class="form-control"
 value="<?php echo $invite_link; ?>"
 readonly>
 
-<button
+
+<button 
 class="btn btn-primary"
-type="button"
 onclick="copyInviteLink()">
 
 📋 Copy Link
 
 </button>
+
+</div>
+
+
+<script>
+
+function copyInviteLink(){
+
+    var link = document.getElementById("inviteLink");
+
+    link.select();
+    link.setSelectionRange(0,99999);
+
+    navigator.clipboard.writeText(link.value)
+    .then(function(){
+
+        alert("Invite Link Copied Successfully!");
+
+    })
+    .catch(function(){
+
+        alert("Copy Failed!");
+
+    });
+
+}
+
+</script>
 
 </div>
 

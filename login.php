@@ -78,7 +78,7 @@ if(isset($_POST['login'])){
 <link rel="stylesheet" href="assets/css/login.css">
 
 
-<link rel="stylesheet" 
+<link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
 
@@ -126,7 +126,7 @@ color:#555;
 </head>
 
 
-<br><br>
+
 
 
 <body>
