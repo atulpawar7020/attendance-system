@@ -14,44 +14,42 @@ $error="";
 if(isset($_POST['login'])){
 
 
-    $email = trim($_POST['email']);
-    $password = trim($_POST['password']);
+$email = $_POST['email'];
+$password = $_POST['password'];
 
 
-    $sql = "SELECT * FROM teachers WHERE email=? AND password=?";
+$query=mysqli_query($conn,
+
+"SELECT * FROM teachers WHERE email='$email'"
+
+);
 
 
-    $stmt = mysqli_prepare($conn,$sql);
+if(mysqli_num_rows($query)>0)
+{
+
+$row=mysqli_fetch_assoc($query);
 
 
-    mysqli_stmt_bind_param($stmt,"ss",$email,$password);
+if(password_verify($password,$row['password']))
+{
+
+$_SESSION['teacher_id']=$row['id'];
+
+header("Location: classes.php");
+exit();
+
+}
+else
+{
+
+echo "Wrong Password";
+
+}
 
 
-    mysqli_stmt_execute($stmt);
+}
 
-
-    $result = mysqli_stmt_get_result($stmt);
-
-
-
-    if(mysqli_num_rows($result)==1){
-
-
-        $teacher = mysqli_fetch_assoc($result);
-
-
-        $_SESSION['teacher_id']=$teacher['id'];
-
-        $_SESSION['teacher_name']=$teacher['full_name'];
-
-
-
-        header("Location: classes.php");
-
-        exit();
-
-
-    }
     else{
 
 

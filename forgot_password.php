@@ -1,64 +1,136 @@
 <?php
 
-include("config/db.php");
-
 session_start();
+
+date_default_timezone_set("Asia/Kolkata");
+
+include("config/db.php");
+include("config/mail.php");
+
 
 $message="";
 
 
-if(isset($_POST['submit'])){
+if(isset($_POST['submit']))
+{
+
+$email=mysqli_real_escape_string($conn,$_POST['email']);
 
 
-$email = $_POST['email'];
+// Check registered email
 
-
-
-$query = mysqli_query($conn,
+$check=mysqli_query($conn,
 
 "SELECT id FROM teachers WHERE email='$email'"
 
 );
 
 
+if(mysqli_num_rows($check)>0)
+{
 
-if(mysqli_num_rows($query)>0){
+
+// Generate OTP
+
+$otp=rand(100000,999999);
+
+
+// Expire after 5 minutes
+
+$expire=date(
+"Y-m-d H:i:s",
+strtotime("+5 minutes")
+);
+
+
+
+// Delete old OTP
+
+mysqli_query($conn,
+
+"DELETE FROM password_resets 
+WHERE email='$email'"
+
+);
+
+
+
+// Insert OTP
+
+$insert=mysqli_query($conn,
+
+"INSERT INTO password_resets
+(email,otp,expires_at)
+
+VALUES
+
+('$email','$otp','$expire')"
+
+);
+
+
+
+if($insert)
+{
+
+
+if(sendOTP($email,$otp))
+{
 
 
 $_SESSION['reset_email']=$email;
 
 
-header("Location: reset_password.php");
-
+header("Location: verify_reset_otp.php");
 
 exit();
 
 
 }
+else
+{
 
-else{
+$message="OTP send failed";
+
+}
 
 
-$message="Email not found";
 
+}
+else
+{
+
+$message="OTP save failed";
+
+}
+
+
+
+}
+else
+{
+
+$message="Email not registered";
 
 }
 
 
 }
-
 
 ?>
 
 
 <!DOCTYPE html>
+
 <html>
 
 <head>
 
 <title>Forgot Password</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link 
+href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+rel="stylesheet">
 
 </head>
 
@@ -69,13 +141,12 @@ $message="Email not found";
 <div class="container mt-5">
 
 
-<div class="card p-4 mx-auto" style="max-width:400px;">
+<div class="card shadow p-4 mx-auto"
+style="max-width:400px;">
 
 
 <h3 class="text-center">
-
 Forgot Password
-
 </h3>
 
 
@@ -83,22 +154,18 @@ Forgot Password
 
 
 <input type="email"
-
 name="email"
-
 class="form-control mb-3"
-
-placeholder="Enter Email"
-
+placeholder="Enter registered email"
 required>
 
 
 
-<button name="submit"
-
+<button 
+name="submit"
 class="btn btn-primary w-100">
 
-Continue
+Send OTP
 
 </button>
 
@@ -106,12 +173,18 @@ Continue
 </form>
 
 
+<?php
 
-<p class="text-danger mt-3">
+if($message!="")
+{
 
-<?php echo $message; ?>
+echo "<p class='text-danger mt-3'>
+$message
+</p>";
 
-</p>
+}
+
+?>
 
 
 </div>
