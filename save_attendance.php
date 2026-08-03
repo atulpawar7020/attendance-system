@@ -6,12 +6,15 @@ include("config/db.php");
 
 date_default_timezone_set("Asia/Kolkata");
 
+
+
 if(!isset($_SESSION['teacher_id'])){
 
-header("Location: login.php");
-exit();
+    header("Location: login.php");
+    exit();
 
 }
+
 
 
 
@@ -25,16 +28,27 @@ $students = $_POST['student_id'];
 $status = $_POST['status'];
 
 
-$date = date("Y-m-d");
+// Selected date from open-class.php
+
+$date = $_POST['attendance_date'];
+
+
 
 
 
 foreach($students as $key=>$student_id){
 
 
+
+$student_id = intval($student_id);
+
 $att_status = $status[$key];
 
 
+
+
+
+// Check attendance already exists
 
 $check = mysqli_query($conn,
 
@@ -46,16 +60,21 @@ WHERE class_id='$class_id'
 AND student_id='$student_id'
 
 AND attendance_date='$date'
+
 "
 
 );
 
 
 
+
+
+
 if(mysqli_num_rows($check)>0){
 
 
-// update existing attendance
+
+// UPDATE existing attendance
 
 
 mysqli_query($conn,
@@ -82,7 +101,8 @@ AND attendance_date='$date'
 else{
 
 
-// insert new attendance
+
+// INSERT new attendance
 
 
 mysqli_query($conn,
@@ -90,11 +110,21 @@ mysqli_query($conn,
 "
 INSERT INTO attendance
 
-(class_id,student_id,attendance_date,status)
+(
+class_id,
+student_id,
+attendance_date,
+status
+)
 
 VALUES
 
-('$class_id','$student_id','$date','$att_status')
+(
+'$class_id',
+'$student_id',
+'$date',
+'$att_status'
+)
 
 "
 
@@ -110,13 +140,36 @@ VALUES
 
 
 
+
+
+
 echo "
 
 <script>
 
 alert('Attendance Saved Successfully');
 
-window.location='open-class.php?class_id=$class_id';
+window.location='open-class.php?class_id=$class_id&date=$date';
+
+</script>
+
+";
+
+
+
+
+}
+
+else{
+
+
+echo "
+
+<script>
+
+alert('No Student Found');
+
+window.history.back();
 
 </script>
 

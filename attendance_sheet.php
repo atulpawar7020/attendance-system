@@ -699,9 +699,12 @@ $percentage=0;
 <div class="text-center">
 
 
-<a href="export_excel.php?class_id=<?php echo $class_id;?>&month=<?php echo $month;?>&year=<?php echo $year;?>"
+<a href="export_excel.php?class_id=<?php echo $class_id; ?>&month=<?php echo $month; ?>&year=<?php echo $year; ?>"
 class="btn btn-success">
-Export Excel
+
+<i class="fa fa-file-excel"></i>
+Download Excel
+
 </a>
 
 

@@ -50,6 +50,9 @@ function sendOTP($email,$otp)
 
         // Sender (SendGrid Verified Sender)
 
+
+
+
         $mail->setFrom(
             "atulpawar9940@gmail.com",
             "Smart Attendance System"

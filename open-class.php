@@ -28,24 +28,31 @@ if(!isset($_GET['class_id'])){
 $class_id = intval($_GET['class_id']);
 
 
-// Today's Date
+// Selected Date
 
-$today = date("Y-m-d");
-
-
+$attendance_date = date("Y-m-d");
 
 
-// Class Details (Only Login Teacher Class)
+if(isset($_GET['date'])){
+
+    $attendance_date = $_GET['date'];
+
+}
+
+
+
+
+// Class Details
 
 $classQuery = mysqli_query($conn,
 
-"SELECT * FROM classes 
+"SELECT * FROM classes
 
 WHERE id='$class_id'
 
-AND teacher_id='$teacher_id'"
+AND teacher_id='$teacher_id'
 
-);
+");
 
 
 $classData = mysqli_fetch_assoc($classQuery);
@@ -57,6 +64,7 @@ if(!$classData){
     die("Class Not Found");
 
 }
+
 
 
 
@@ -76,6 +84,7 @@ ORDER BY roll_no ASC"
 
 
 ?>
+
 
 
 <!DOCTYPE html>
@@ -127,10 +136,12 @@ color:white;
 }
 
 
+
 </style>
 
 
 </head>
+
 
 
 
@@ -150,7 +161,6 @@ color:white;
 <div class="d-flex justify-content-between">
 
 
-
 <div>
 
 
@@ -168,20 +178,6 @@ Subject :
 <b>
 
 <?php echo $classData['subject']; ?>
-
-</b>
-
-</p>
-
-
-
-<p>
-
-Date :
-
-<b>
-
-<?php echo date("d-m-Y"); ?>
 
 </b>
 
@@ -212,8 +208,8 @@ Add Student
 </div>
 
 
-
 </div>
+
 
 
 <hr>
@@ -221,7 +217,84 @@ Add Student
 
 
 
+<!-- Date Selection -->
+
+
+<form method="GET" class="row mb-4">
+
+
+<input type="hidden"
+
+name="class_id"
+
+value="<?php echo $class_id; ?>">
+
+
+
+<div class="col-md-5">
+
+
+<label class="fw-bold">
+
+Select Attendance Date
+
+</label>
+
+
+<input type="date"
+
+name="date"
+
+value="<?php echo $attendance_date; ?>"
+
+class="form-control"
+
+required>
+
+
+</div>
+
+
+
+<div class="col-md-3 mt-4">
+
+
+<button class="btn btn-primary">
+
+<i class="fa fa-calendar"></i>
+
+Load Date
+
+</button>
+
+
+</div>
+
+
+</form>
+
+
+
+
+
+<h5>
+
+Attendance Date :
+
+<?php echo date("d-m-Y",strtotime($attendance_date)); ?>
+
+</h5>
+
+
+
+<hr>
+
+
+
+
+
 <form action="save_attendance.php" method="POST">
+
 
 
 <input type="hidden"
@@ -236,7 +309,7 @@ value="<?php echo $class_id; ?>">
 
 name="attendance_date"
 
-value="<?php echo $today; ?>">
+value="<?php echo $attendance_date; ?>">
 
 
 
@@ -247,7 +320,8 @@ value="<?php echo $today; ?>">
 
 <tr>
 
-<th width="120">
+
+<th>
 
 Roll No
 
@@ -261,7 +335,7 @@ Student Name
 </th>
 
 
-<th width="200">
+<th>
 
 Attendance
 
@@ -282,20 +356,23 @@ $student_id=$row['id'];
 
 
 
-// Check Today's Attendance
+
+// Check selected date attendance
 
 
 $check=mysqli_query($conn,
 
 "
 
-SELECT status FROM attendance
+SELECT status
+
+FROM attendance
 
 WHERE student_id='$student_id'
 
 AND class_id='$class_id'
 
-AND attendance_date='$today'
+AND attendance_date='$attendance_date'
 
 "
 
@@ -327,12 +404,12 @@ $status=$data['status'];
 <tr>
 
 
-
 <td>
 
 <?php echo $row['roll_no']; ?>
 
 </td>
+
 
 
 
@@ -354,15 +431,17 @@ value="<?php echo $student_id; ?>">
 
 
 
+
 <td>
 
 
 
 <button type="button"
 
-class="btn attendance-btn 
+class="btn attendance-btn
 
 <?php echo ($status=="Present")?'btn-success':'btn-danger'; ?>">
+
 
 
 <?php echo $status; ?>
@@ -385,7 +464,6 @@ value="<?php echo $status; ?>">
 </td>
 
 
-
 </tr>
 
 
@@ -399,14 +477,16 @@ value="<?php echo $status; ?>">
 
 
 
+
 <button class="btn btn-success">
+
 
 <i class="fa fa-save"></i>
 
 Save Attendance
 
-</button>
 
+</button>
 
 
 
@@ -420,17 +500,17 @@ Back
 
 
 
-
 </form>
 
 
 
 </div>
 
-</div>
 
 </div>
 
+
+</div>
 
 
 
@@ -468,7 +548,6 @@ this.classList.remove("btn-danger");
 this.classList.add("btn-success");
 
 
-
 }
 
 else{
@@ -485,9 +564,7 @@ this.classList.remove("btn-success");
 this.classList.add("btn-danger");
 
 
-
 }
-
 
 
 });
@@ -498,6 +575,7 @@ this.classList.add("btn-danger");
 
 
 </script>
+
 
 
 

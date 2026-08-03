@@ -3,19 +3,26 @@ session_start();
 
 include("config/db.php");
 
+
 if(isset($_SESSION['teacher_id'])){
+
     header("Location: classes.php");
     exit();
+
 }
 
+
 $error="";
+
 
 
 if(isset($_POST['login'])){
 
 
-$email = $_POST['email'];
+$email = mysqli_real_escape_string($conn,$_POST['email']);
+
 $password = $_POST['password'];
+
 
 
 $query=mysqli_query($conn,
@@ -25,50 +32,62 @@ $query=mysqli_query($conn,
 );
 
 
+
 if(mysqli_num_rows($query)>0)
 {
 
+
 $row=mysqli_fetch_assoc($query);
+
 
 
 if(password_verify($password,$row['password']))
 {
 
+
 $_SESSION['teacher_id']=$row['id'];
 
+
 header("Location: classes.php");
+
 exit();
 
+
 }
+
 else
 {
 
-echo "Wrong Password";
+$error="Wrong Password";
 
 }
 
 
 }
 
-    else{
+else
+{
 
+$error="Invalid Email or Password";
 
-        $error="Invalid Email or Password";
+}
 
-
-    }
 
 
 }
+
+
 
 ?>
 
 
 
 <!DOCTYPE html>
+
 <html>
 
 <head>
+
 
 <title>Teacher Login</title>
 
@@ -81,10 +100,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
 
 
 
-
 <style>
-
-
 
 
 .password-box{
@@ -103,7 +119,9 @@ padding-right:45px;
 }
 
 
+
 .password-box i{
+
 
 position:absolute;
 
@@ -115,21 +133,47 @@ cursor:pointer;
 
 color:#555;
 
+
 }
 
 
+
+.error-box{
+
+
+background:#ffe5e5;
+
+color:red;
+
+padding:10px;
+
+border-radius:8px;
+
+text-align:center;
+
+margin-bottom:15px;
+
+font-weight:bold;
+
+
+}
+
+
+
 </style>
+
 
 
 </head>
 
 
 
-
-
 <body>
 
+
 <br><br>
+
+
 
 <div class="container">
 
@@ -170,6 +214,7 @@ Attendance Management System
 
 
 
+
 <div class="right">
 
 
@@ -179,11 +224,22 @@ Attendance Management System
 
 
 
+
 <?php
 
-if($error!=""){
+if($error!="")
+{
 
-echo "<p style='color:red;text-align:center;'>$error</p>";
+?>
+
+<div class="error-box">
+
+<?php echo $error; ?>
+
+</div>
+
+
+<?php
 
 }
 
@@ -193,7 +249,10 @@ echo "<p style='color:red;text-align:center;'>$error</p>";
 
 
 
+
 <form method="POST">
+
+
 
 
 
@@ -218,6 +277,7 @@ required>
 
 
 
+
 <div class="input-group password-box">
 
 
@@ -235,6 +295,7 @@ id="password"
 required>
 
 
+
 <i class="fa fa-eye" 
 
 id="togglePassword"></i>
@@ -246,9 +307,12 @@ id="togglePassword"></i>
 
 
 
+
 <button class="btn" name="login">
 
+
 Login
+
 
 </button>
 
@@ -256,6 +320,7 @@ Login
 
 
 </form>
+
 
 
 
@@ -273,6 +338,7 @@ Forgot Password?
 </a>
 
 
+
 <br><br>
 
 
@@ -280,6 +346,7 @@ Don't have an account?
 
 
 <br>
+
 
 
 <a href="signup.php">
@@ -294,10 +361,14 @@ Create Account
 
 
 
+
 </div>
 
 
+
 </div>
+
+
 
 
 
@@ -347,8 +418,8 @@ this.classList.add("fa-eye");
 }
 
 
-
 }
+
 
 
 
@@ -357,6 +428,5 @@ this.classList.add("fa-eye");
 
 
 </body>
-
 
 </html>
