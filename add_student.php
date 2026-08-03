@@ -312,6 +312,42 @@ onclick="copyInviteLink()">
 </div>
 
 
+
+</div>
+
+<div class="card mt-4">
+
+<div class="card-header bg-warning text-dark">
+
+<h5>
+📂 Upload Students Excel
+</h5>
+
+</div>
+
+
+<div class="card-body">
+
+<a href="upload_students.php?class_id=<?php echo $class_id; ?>"
+class="btn btn-warning w-100">
+
+<i class="fa fa-file-excel"></i>
+
+Upload Excel File
+
+</a>
+
+</div>
+
+</div>
+
+
+</div>
+
+
+
+
+
 <script>
 
 function copyInviteLink(){
