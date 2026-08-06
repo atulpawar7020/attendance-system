@@ -2,9 +2,7 @@
 
 ob_start();
 
-error_reporting(E_ALL);
-ini_set('display_errors','0');
-
+error_reporting(0);
 
 include("config/db.php");
 
@@ -16,30 +14,58 @@ use Dompdf\Options;
 
 
 
+// ==========================
+// CLASS ID CHECK
+// ==========================
+
+
 if(!isset($_GET['class_id']))
 {
     die("Class ID Missing");
 }
 
 
-
 $class_id = intval($_GET['class_id']);
 
 
 
-$month = isset($_GET['month']) ? intval($_GET['month']) : date('m');
 
-$year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
-
-
-
+// ==========================
+// OPTIONAL MONTH YEAR
+// ==========================
 
 
-// CLASS DATA
+$month = isset($_GET['month']) && $_GET['month']!=""
+? intval($_GET['month'])
+: "";
+
+
+$year = isset($_GET['year']) && $_GET['year']!=""
+? intval($_GET['year'])
+: "";
+
+
+
+
+
+
+
+
+// ==========================
+// CLASS DETAILS
+// ==========================
+
 
 $classQuery=mysqli_query($conn,
 
-"SELECT * FROM classes WHERE id='$class_id'"
+"
+SELECT *
+
+FROM classes
+
+WHERE id='$class_id'
+
+"
 
 );
 
@@ -59,14 +85,27 @@ if(!$class)
 
 
 
-// PDF SETUP
+
+
+// ==========================
+// DOMPDF SETUP
+// ==========================
 
 
 $options=new Options();
 
-$options->set('isHtml5ParserEnabled',true);
 
-$options->set('isRemoteEnabled',true);
+$options->set(
+'isHtml5ParserEnabled',
+true
+);
+
+
+$options->set(
+'isRemoteEnabled',
+true
+);
+
 
 
 $dompdf=new Dompdf($options);
@@ -77,16 +116,56 @@ $dompdf=new Dompdf($options);
 
 
 
-$html='';
 
 
-$html.="
+// ==========================
+// TITLE
+// ==========================
+
+
+if($month!="" && $year!="")
+{
+
+
+$title =
+$class['class_name'].
+" Attendance Sheet - ".
+date(
+"F Y",
+mktime(0,0,0,$month,1,$year)
+);
+
+
+}
+else
+{
+
+
+$title =
+$class['class_name'].
+" Overall Attendance Sheet";
+
+
+}
+
+
+
+
+
+
+
+
+
+
+$html="
 
 <style>
 
 body{
 
-font-family: Arial;
+font-family:Arial;
+
+font-size:12px;
 
 }
 
@@ -100,31 +179,28 @@ color:#2F5496;
 }
 
 
-
 table{
-
-border-collapse:collapse;
 
 width:100%;
 
-font-size:11px;
+border-collapse:collapse;
 
 }
 
 
-
 th{
 
-background:#0d6efd;
+background:#0D6EFD;
 
 color:white;
 
 padding:6px;
 
-border:1px solid #999;
+border:1px solid #555;
+
+text-align:center;
 
 }
-
 
 
 td{
@@ -138,7 +214,6 @@ text-align:center;
 }
 
 
-
 .name{
 
 text-align:left;
@@ -146,8 +221,7 @@ text-align:left;
 }
 
 
-
-.p{
+.present{
 
 color:green;
 
@@ -156,8 +230,7 @@ font-weight:bold;
 }
 
 
-
-.a{
+.absent{
 
 color:red;
 
@@ -169,48 +242,40 @@ font-weight:bold;
 
 </style>
 
-";
 
+<h2>
+$title
+</h2>
 
-
-
-
-$html.="<h2>
-
-".$class['class_name']." Attendance Sheet
-
-</h2>";
-
-
-
-$html.="<h4>
-
-".date("F Y",mktime(0,0,0,$month,1,$year))."
-
-</h4>";
-
-
-
-
-
-$html.="
 
 <table>
 
 <tr>
 
-<th>Roll</th>
-
-<th>Student Name</th>
-
-";
+<th>
+Roll No
+</th>
 
 
+<th>
+Student Name
+</th>";
 
 
 
 
-// DATE COLUMNS
+
+
+
+
+
+// ==========================
+// GET DATES
+// ==========================
+
+
+if($month!="" && $year!="")
+{
 
 
 $dateQuery=mysqli_query($conn,
@@ -232,7 +297,37 @@ ORDER BY attendance_date ASC
 
 "
 
+
 );
+
+
+
+}
+else
+{
+
+
+$dateQuery=mysqli_query($conn,
+
+
+"
+
+SELECT DISTINCT attendance_date
+
+FROM attendance
+
+WHERE class_id='$class_id'
+
+ORDER BY attendance_date ASC
+
+"
+
+
+);
+
+
+
+}
 
 
 
@@ -240,34 +335,45 @@ $dates=[];
 
 
 
-while($d=mysqli_fetch_assoc($dateQuery))
+while($date=mysqli_fetch_assoc($dateQuery))
 {
 
-$dates[]=$d['attendance_date'];
+
+$dates[]=$date['attendance_date'];
 
 
-$html.="
+$html .= "
 
 <th>
 
-".date("d-M",strtotime($d['attendance_date']))."
+".date(
+"d-m-Y",
+strtotime($date['attendance_date'])
+)."
 
-</th>
+</th>";
 
-";
+
 
 }
 
 
 
+$html .= "
 
-$html.="
+<th>
+Present
+</th>
 
-<th>Present</th>
+<th>
+Absent
+</th>
 
-<th>Absent</th>
 
-<th>Attendance %</th>
+<th>
+Attendance %
+</th>
+
 
 </tr>";
 
@@ -277,19 +383,25 @@ $html.="
 
 
 
-// STUDENTS
+
+// ==========================
+// STUDENT DATA
+// ==========================
 
 
-$students=mysqli_query($conn,
+$studentQuery=mysqli_query($conn,
 
 
 "
 
-SELECT * FROM students
+SELECT *
+
+FROM students
 
 WHERE class_id='$class_id'
 
 ORDER BY roll_no ASC
+
 
 "
 
@@ -299,36 +411,36 @@ ORDER BY roll_no ASC
 
 
 
-
-
-while($student=mysqli_fetch_assoc($students))
+while($student=mysqli_fetch_assoc($studentQuery))
 {
+
+
+$student_id=$student['id'];
+
+
+$present=0;
+
+$absent=0;
+
 
 
 $html.="
 
 <tr>
 
+
 <td>
-
 ".$student['roll_no']."
-
 </td>
 
 
 <td class='name'>
-
 ".$student['full_name']."
-
 </td>
+
 
 ";
 
-
-
-$present=0;
-
-$absent=0;
 
 
 
@@ -343,11 +455,13 @@ $att=mysqli_query($conn,
 
 "
 
-SELECT status FROM attendance
+SELECT status
+
+FROM attendance
 
 WHERE class_id='$class_id'
 
-AND student_id='".$student['id']."'
+AND student_id='$student_id'
 
 AND attendance_date='$date'
 
@@ -357,20 +471,37 @@ AND attendance_date='$date'
 
 
 
+$status="";
+
+
+
 if(mysqli_num_rows($att)>0)
 {
 
 
-$data=mysqli_fetch_assoc($att);
+$row=mysqli_fetch_assoc($att);
+
+
+$status=$row['status'];
+
+
+}
 
 
 
-if($data['status']=="Present")
+
+
+
+
+if($status=="Present")
 {
+
 
 $html.="
 
-<td class='p'>P</td>
+<td class='present'>
+P
+</td>
 
 ";
 
@@ -380,13 +511,15 @@ $present++;
 
 }
 
-else
+elseif($status=="Absent")
 {
 
 
 $html.="
 
-<td class='a'>A</td>
+<td class='absent'>
+A
+</td>
 
 ";
 
@@ -396,25 +529,26 @@ $absent++;
 
 }
 
-
-
-}
-
 else
 {
 
 
 $html.="
 
-<td>-</td>
+<td>
+-
+</td>
+
 
 ";
 
-}
-
-
 
 }
+
+
+
+}
+
 
 
 
@@ -422,16 +556,19 @@ $html.="
 $total=$present+$absent;
 
 
-
 $percentage=0;
+
 
 
 if($total>0)
 {
 
-$percentage=round(($present/$total)*100);
+$percentage=round(
+($present/$total)*100
+);
 
 }
+
 
 
 
@@ -440,30 +577,25 @@ $html.="
 
 
 <td>
-
-".$present."
-
+$present
 </td>
-
 
 
 <td>
-
-".$absent."
-
+$absent
 </td>
-
 
 
 <td>
-
-".$percentage."%
-
+$percentage%
 </td>
 
 
 
-</tr>";
+</tr>
+
+
+";
 
 
 
@@ -471,17 +603,32 @@ $html.="
 
 
 
-$html.="</table>";
+
+
+
+$html.="
+
+</table>
+
+";
 
 
 
 
+
+
+// ==========================
+// CREATE PDF
+// ==========================
 
 
 $dompdf->loadHtml($html);
 
 
-$dompdf->setPaper('A4','landscape');
+$dompdf->setPaper(
+'A4',
+'landscape'
+);
 
 
 $dompdf->render();
@@ -491,7 +638,48 @@ $dompdf->render();
 
 
 
-$file=$class['class_name']."_Attendance.pdf";
+
+
+// ==========================
+// FILE NAME
+// ==========================
+
+
+if($month!="" && $year!="")
+{
+
+
+$fileName =
+
+$class['class_name'].
+
+"_Attendance_".
+
+date(
+"M-Y",
+mktime(0,0,0,$month,1,$year)
+).
+
+".pdf";
+
+
+}
+else
+{
+
+
+$fileName =
+
+$class['class_name'].
+
+"_Overall_Attendance.pdf";
+
+
+}
+
+
+
+
 
 
 
@@ -504,7 +692,9 @@ ob_end_clean();
 
 
 
-$dompdf->stream($file,
+$dompdf->stream(
+
+$fileName,
 
 [
 "Attachment"=>true
@@ -513,7 +703,7 @@ $dompdf->stream($file,
 );
 
 
-exit();
+exit;
 
 
 ?>

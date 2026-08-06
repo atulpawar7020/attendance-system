@@ -14,7 +14,7 @@ if($_SERVER['SERVER_NAME']=="localhost"){
     $conn=mysqli_connect(
         "sql203.infinityfree.com",
         "if0_42566807",
-        "YOUR_PASSWORD",
+        "Atul9940",
         "if0_42566807_attendance"
     );
 

@@ -375,7 +375,7 @@ if(isset($_POST['upload'])){
 
 body{
 
-background:#f5f7fb;
+background:#f4f7fc;
 
 }
 
@@ -383,9 +383,7 @@ background:#f5f7fb;
 .card{
 
 border:none;
-
-border-radius:15px;
-
+border-radius:20px;
 box-shadow:0 5px 15px rgba(0,0,0,.15);
 
 }
@@ -414,7 +412,7 @@ box-shadow:0 5px 15px rgba(0,0,0,.15);
 
 
 
-<div class="card-header bg-warning">
+<div class="card-header bg-primary text-white">
 
 <h3>
 📂 Upload Students Excel

@@ -250,7 +250,6 @@ class="form-control">
 <br>
 
 
-<br>
 
 <button type="submit"
 name="add_student"
@@ -267,6 +266,7 @@ class="btn btn-secondary">
 Back
 
 </a>
+
 
 
 
@@ -315,29 +315,36 @@ onclick="copyInviteLink()">
 
 </div>
 
-<div class="card mt-4">
 
-<div class="card-header bg-warning text-dark">
+<hr>
 
-<h5>
-📂 Upload Students Excel
-</h5>
 
+<div class="card-header bg-primary text-white">
+    <h5 class="mb-0">
+        📂 Upload Students Excel file
+    </h5>
 </div>
-
 
 <div class="card-body">
 
-<a href="upload_students.php?class_id=<?php echo $class_id; ?>"
-class="btn btn-warning w-100">
+    <a href="upload_students.php?class_id=<?php echo $class_id; ?>"
+       class="btn btn-success w-100">
+
+        <i class="fas fa-upload"></i>
+        Upload Excel File
+
+    </a>
+
+</div>
+
+<a href="manage_students_excel.php?class_id=<?php echo $class_id; ?>"
+class="btn btn-success">
 
 <i class="fa fa-file-excel"></i>
 
-Upload Excel File
+Manage Student Excel
 
 </a>
-
-</div>
 
 </div>
 

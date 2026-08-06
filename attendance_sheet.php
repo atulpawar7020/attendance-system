@@ -17,7 +17,6 @@ if(!isset($_SESSION['teacher_id'])){
 }
 
 
-
 // Class ID Check
 
 if(!isset($_GET['class_id'])){
@@ -27,17 +26,15 @@ if(!isset($_GET['class_id'])){
 }
 
 
-$class_id=$_GET['class_id'];
+$class_id = intval($_GET['class_id']);
 
 
 
-// Default ALL Attendance
+// Month Year Filter
 
 $month="";
 $year="";
 
-
-// Filter Apply
 
 if(isset($_GET['month']) && $_GET['month']!=""){
 
@@ -54,8 +51,7 @@ if(isset($_GET['year']) && $_GET['year']!=""){
 
 
 
-
-// Class Information
+// Get Class Details
 
 $classQuery=mysqli_query($conn,
 
@@ -66,10 +62,22 @@ $class=mysqli_fetch_assoc($classQuery);
 
 
 
+if(!$class){
 
-// Students List
+    die("Class Not Found");
 
-$students=mysqli_query($conn,
+}
+
+
+
+
+// Get Students
+
+$students=[];
+
+
+$studentQuery=mysqli_query($conn,
+
 
 "SELECT * FROM students
 
@@ -78,10 +86,18 @@ WHERE class_id='$class_id'
 ORDER BY roll_no ASC");
 
 
+while($row=mysqli_fetch_assoc($studentQuery)){
+
+
+    $students[]=$row;
+
+
+}
 
 
 
-// Attendance Date Query
+
+// Get Attendance Taken Dates
 
 $dateSql="
 
@@ -122,6 +138,7 @@ $dateQuery=mysqli_query($conn,$dateSql);
 $dates=[];
 
 
+
 while($row=mysqli_fetch_assoc($dateQuery)){
 
 
@@ -129,7 +146,6 @@ while($row=mysqli_fetch_assoc($dateQuery)){
 
 
 }
-
 
 
 ?>
@@ -147,6 +163,8 @@ while($row=mysqli_fetch_assoc($dateQuery)){
 Attendance Sheet
 </title>
 
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -177,13 +195,13 @@ border-radius:15px;
 
 .table th{
 
-
 background:#0d6efd!important;
 
 color:white;
 
 text-align:center;
 
+white-space:nowrap;
 
 }
 
@@ -191,11 +209,11 @@ text-align:center;
 
 .table td{
 
-
 text-align:center;
 
 vertical-align:middle;
 
+white-space:nowrap;
 
 }
 
@@ -203,13 +221,11 @@ vertical-align:middle;
 
 .present{
 
-
 color:green;
 
 font-size:20px;
 
 font-weight:bold;
-
 
 }
 
@@ -217,13 +233,11 @@ font-weight:bold;
 
 .absent{
 
-
 color:red;
 
 font-size:20px;
 
 font-weight:bold;
-
 
 }
 
@@ -231,32 +245,37 @@ font-weight:bold;
 
 .percent{
 
-
 color:#0d6efd;
 
 font-weight:bold;
 
+}
+
+
+
+.studentName{
+
+font-weight:500;
 
 }
+
 
 
 </style>
 
 
-</head>
 
+</head>
 
 
 <body>
 
 
 
-<div class="container mt-4">
-
+<div class="container-fluid mt-4">
 
 
 <div class="card shadow">
-
 
 
 <div class="card-header bg-primary text-white">
@@ -287,13 +306,16 @@ Subject :
 
 
 
-<!-- FILTER -->
+<!-- MONTH YEAR FILTER -->
+
 
 <form method="GET" class="row mb-3">
 
 
 <input type="hidden"
+
 name="class_id"
+
 value="<?php echo $class_id; ?>">
 
 
@@ -306,10 +328,9 @@ value="<?php echo $class_id; ?>">
 
 <option value="">
 
-select Month
+Select Month
 
 </option>
-
 
 
 <?php
@@ -318,19 +339,22 @@ select Month
 for($i=1;$i<=12;$i++){
 
 
-$selected=($month==$i)?"selected":"";
+$sel=($month==$i)?"selected":"";
 
 
-echo "
+?>
 
-<option value='$i' $selected>
 
-".date("F",mktime(0,0,0,$i,1))."
+<option value="<?php echo $i;?>" <?php echo $sel;?>>
 
-</option>";
+<?php echo date("F",mktime(0,0,0,$i,1)); ?>
+
+</option>
+
+
+<?php
 
 }
-
 
 ?>
 
@@ -352,7 +376,7 @@ echo "
 
 <option value="">
 
-select Year 
+Select Year
 
 </option>
 
@@ -364,19 +388,22 @@ select Year
 for($y=2025;$y<=2035;$y++){
 
 
-$selected=($year==$y)?"selected":"";
+$sel=($year==$y)?"selected":"";
 
 
-echo "
+?>
 
-<option value='$y' $selected>
 
-$y
+<option value="<?php echo $y;?>" <?php echo $sel;?>>
 
-</option>";
+<?php echo $y; ?>
+
+</option>
+
+
+<?php
 
 }
-
 
 ?>
 
@@ -392,7 +419,7 @@ $y
 <div class="col-md-2">
 
 
-<button class="btn btn-primary">
+<button class="btn btn-primary w-100">
 
 View
 
@@ -400,7 +427,6 @@ View
 
 
 </div>
-
 
 
 </form>
@@ -418,95 +444,69 @@ class="form-control mb-3"
 placeholder="Search Student Name...">
 
 
-<br>
+
+
+<!-- TABLE PART 2 HERE -->
+
+
+<!-- ATTENDANCE TABLE -->
 
 
 <div class="table-responsive">
 
 
-<table class="table table-bordered"
+<table class="table table-bordered table-striped">
 
-id="attendanceTable">
 
+<thead>
 
 
 <tr>
 
 
+<th>Roll No</th>
+
+
+<th>Student Name</th>
+
+
+
+<?php foreach($dates as $date){ ?>
+
+
 <th>
-Roll
+
+<?php echo date("d M",strtotime($date)); ?>
+
 </th>
 
 
-<th>
-Student Name
-</th>
+<?php } ?>
 
 
 
-<?php
+<th>Present</th>
 
 
-foreach($dates as $date){
+<th>Absent</th>
 
 
-echo "
+<th>%</th>
 
-<th>
-
-".date("d M",strtotime($date))."
-
-</th>";
-
-
-}
-
-
-
-?>
-
-
-<th>
-Present
-</th>
-
-
-<th>
-Absent
-</th>
-
-
-<th>
-Attendance %
-</th>
 
 
 </tr>
 
 
+</thead>
 
 
 
+<tbody>
 
 
 
-<?php
-
-
-mysqli_data_seek($students,0);
-
-
-
-while($student=mysqli_fetch_assoc($students)){
-
-
-$present=0;
-
-$absent=0;
-
-
-?>
-
+<?php foreach($students as $student){ ?>
 
 
 <tr class="studentRow">
@@ -521,6 +521,7 @@ $absent=0;
 
 
 
+
 <td class="studentName">
 
 <?php echo $student['full_name']; ?>
@@ -529,11 +530,21 @@ $absent=0;
 
 
 
+
 <?php
+
+
+$present=0;
+
+$absent=0;
 
 
 
 foreach($dates as $date){
+
+
+
+$status="";
 
 
 
@@ -555,88 +566,10 @@ AND attendance_date='$date'"
 if(mysqli_num_rows($attQuery)>0){
 
 
-
 $att=mysqli_fetch_assoc($attQuery);
 
 
-
-if($att['status']=="Present"){
-
-
-$present++;
-
-
-
-echo "
-
-<td class='present'>
-
-P
-
-</td>";
-
-
-
-}
-
-else{
-
-
-$absent++;
-
-
-
-echo "
-
-<td class='absent'>
-
-A
-
-</td>";
-
-
-
-}
-
-
-
-}
-
-else{
-
-
-echo "
-
-<td>
-
--
-
-</td>";
-
-}
-
-
-}
-
-
-
-
-$total=$present+$absent;
-
-
-
-if($total>0){
-
-
-$percentage=round(($present/$total)*100);
-
-
-}
-
-else{
-
-
-$percentage=0;
+$status=$att['status'];
 
 
 }
@@ -649,6 +582,83 @@ $percentage=0;
 
 <td>
 
+
+<?php
+
+
+
+if($status=="Present"){
+
+
+echo "<span class='present'>P</span>";
+
+$present++;
+
+
+}
+
+
+elseif($status=="Absent"){
+
+
+echo "<span class='absent'>A</span>";
+
+$absent++;
+
+
+}
+
+
+else{
+
+
+echo "-";
+
+
+}
+
+
+
+?>
+
+
+</td>
+
+
+
+<?php } ?>
+
+
+
+
+
+
+<?php
+
+
+$total=$present+$absent;
+
+
+$percentage=0;
+
+
+if($total>0){
+
+
+$percentage=round(($present/$total)*100);
+
+
+}
+
+
+
+?>
+
+
+
+
+<td class="present">
+
 <?php echo $present; ?>
 
 </td>
@@ -656,11 +666,12 @@ $percentage=0;
 
 
 
-<td>
+<td class="absent">
 
 <?php echo $absent; ?>
 
 </td>
+
 
 
 
@@ -676,11 +687,11 @@ $percentage=0;
 
 
 
-<?php
+<?php } ?>
 
-}
 
-?>
+
+</tbody>
 
 
 
@@ -692,18 +703,28 @@ $percentage=0;
 
 
 
+
 <br>
 
+
+<hr>
+<br>
+
+<!-- BUTTONS -->
 
 
 <div class="text-center">
 
 
-<a href="export_excel.php?class_id=<?php echo $class_id; ?>&month=<?php echo $month; ?>&year=<?php echo $year; ?>"
+<a href="export_excel.php?class_id=<?php echo $class_id; ?>&month=<?php echo $month; ?>&year=<?php echo $year;?>"
+
 class="btn btn-success">
 
+
 <i class="fa fa-file-excel"></i>
+
 Download Excel
+
 
 </a>
 
@@ -717,18 +738,11 @@ class="btn btn-danger">
 
 <i class="fa fa-file-pdf"></i>
 
-Export PDF
+Download PDF
 
 
 </a>
 
-
-</div>
-
-
-
-
-<br>
 
 
 
@@ -736,7 +750,9 @@ Export PDF
 
 class="btn btn-secondary">
 
+
 Back
+
 
 </a>
 
@@ -745,8 +761,10 @@ Back
 </div>
 
 
+
 </div>
 
+</div>
 
 </div>
 
@@ -778,13 +796,11 @@ let rows=document.querySelectorAll(".studentRow");
 rows.forEach(function(row){
 
 
-
 let name=row.querySelector(".studentName")
 
 .innerText
 
 .toLowerCase();
-
 
 
 
