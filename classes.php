@@ -64,93 +64,508 @@ ORDER BY id DESC"
 <style>
 
 
-body{
+/* =========================================
+   BODY
+========================================= */
 
-background: #edeaed;
+body {
+    background: #edeaed;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* =========================================
+   COMMON CARD
+========================================= */
+
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.66);
+}
+
+
+/* =========================================
+   CLASS CARD
+========================================= */
+
+.class-card {
+    position: relative;
+
+    border: none;
+    border-radius: 15px;
+
+    background: #ffffff;
+
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.66);
+
+    transition: 0.4s;
+
+    /* IMPORTANT:
+       Dropdown card ke bahar bhi dikhega
+    */
+    overflow: visible !important;
+
+    z-index: 1;
+}
+
+
+.class-card:hover {
+    transform: translateY(-5px);
+
+    z-index: 100;
+}
+
+
+/* =========================================
+   CLASS GRID / CONTAINER
+========================================= */
+
+.class-grid,
+.classes-container,
+.row {
+    overflow: visible !important;
+}
+
+
+/* =========================================
+   PROFILE IMAGE
+========================================= */
+
+.profile-img {
+    width: 55px;
+    height: 55px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    display: block;
+}
+
+
+/* =========================================
+   BIG PROFILE
+========================================= */
+
+.big-profile {
+    width: 90px;
+    height: 90px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    display: block;
+}
+
+
+/* =========================================
+   PROFILE BUTTON
+========================================= */
+
+.profile-button {
+    width: 45px;
+    height: 45px;
+
+    padding: 0;
+
+    border-radius: 50%;
+
+    overflow: hidden;
+
+    border: 1px solid #ddd;
+
+    background: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    cursor: pointer;
+}
+
+
+.profile-button:hover {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+
+/* =========================================
+   THREE DOT MENU CONTAINER
+========================================= */
+
+.class-menu {
+    position: relative;
+
+    z-index: 9999;
+}
+
+
+/* =========================================
+   THREE DOT BUTTON
+========================================= */
+
+.menu-btn {
+    width: 42px;
+    height: 42px;
+
+    padding: 0;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #f5f5f5;
+
+    color: #222;
+
+    font-size: 24px;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    transition: 0.2s;
+}
+
+
+.menu-btn:hover {
+    background: #e5e5e5;
+}
+
+
+.menu-btn:focus {
+    outline: none;
+
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+}
+
+
+/* =========================================
+   DROPDOWN MENU
+========================================= */
+
+.class-dropdown {
+    position: absolute;
+
+    top: 48px;
+
+    right: 0;
+
+    width: 230px;
+
+    background: #ffffff;
+
+    border-radius: 10px;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+
+    z-index: 999999;
+
+    overflow: visible !important;
+
+    padding: 6px 0;
+
+    display: none;
+}
+
+
+/* =========================================
+   DROPDOWN LINKS
+========================================= */
+
+.class-dropdown a {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 12px 16px;
+
+    color: #333;
+
+    text-decoration: none;
+
+    font-size: 15px;
+
+    background: #ffffff;
+
+    white-space: nowrap;
+
+    transition: 0.2s;
+}
+
+
+.class-dropdown a:hover {
+    background: #f1f3f5;
+
+    color: #0d6efd;
+}
+
+
+/* =========================================
+   DELETE CLASS
+========================================= */
+
+.class-dropdown a.delete-class {
+    color: #dc3545;
+}
+
+
+.class-dropdown a.delete-class:hover {
+    background: #ffe5e5;
+
+    color: #dc3545;
+}
+
+
+/* =========================================
+   START ATTENDANCE BUTTON
+========================================= */
+
+.start-btn {
+    width: 100%;
+
+    border: none;
+
+    border-radius: 8px;
+
+    padding: 12px;
+
+    background: #198754;
+
+    color: white;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+.start-btn:hover {
+    background: #157347;
+}
+
+
+/* =========================================
+   CREATE CLASS BUTTON
+========================================= */
+
+.create-class-btn {
+    border: none;
+
+    border-radius: 8px;
+
+    background: #0d6efd;
+
+    color: white;
+
+    padding: 10px 18px;
+
+    font-size: 16px;
+
+    text-decoration: none;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+}
+
+
+.create-class-btn:hover {
+    background: #0b5ed7;
+
+    color: white;
+}
+
+
+/* =========================================
+   CLASS TITLE
+========================================= */
+
+.class-title {
+    font-size: 24px;
+
+    font-weight: 600;
+
+    color: #222;
+
+    margin-bottom: 10px;
+}
+
+
+/* =========================================
+   SUBJECT
+========================================= */
+
+.class-subject {
+    color: #666;
+
+    font-size: 16px;
+
+    margin-bottom: 12px;
+}
+
+
+/* =========================================
+   STUDENT COUNT
+========================================= */
+
+.student-count {
+    font-size: 16px;
+
+    color: #333;
+
+    margin-bottom: 15px;
+}
+
+
+.student-count strong {
+    font-weight: 700;
+
+    color: #222;
+}
+
+
+/* =========================================
+   PROFILE DROPDOWN
+========================================= */
+
+.profile-dropdown {
+    position: absolute;
+
+    top: 55px;
+
+    right: 0;
+
+    width: 220px;
+
+    background: white;
+
+    border-radius: 12px;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.20);
+
+    z-index: 999999;
+
+    overflow: hidden;
+}
+
+
+.profile-dropdown a {
+    display: block;
+
+    padding: 12px 15px;
+
+    color: #333;
+
+    text-decoration: none;
+}
+
+
+.profile-dropdown a:hover {
+    background: #f2f4f7;
+}
+
+
+/* =========================================
+   DELETE / LOGOUT
+========================================= */
+
+.delete-link,
+.logout-link {
+    color: #dc3545 !important;
+}
+
+
+.delete-link:hover,
+.logout-link:hover {
+    background: #ffe5e5 !important;
+}
+
+
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+
+    .class-dropdown {
+
+        right: 0;
+
+        width: 210px;
+
+    }
+
+
+    .class-title {
+
+        font-size: 20px;
+
+    }
+
+
+    .profile-img {
+
+        width: 45px;
+
+        height: 45px;
+
+    }
+
+
+    .class-card {
+
+        margin-bottom: 20px;
+
+    }
 
 }
 
 
+/* =========================================
+   VERY SMALL SCREEN
+========================================= */
 
-.card{
+@media (max-width: 480px) {
 
-border:none;
+    .class-dropdown {
 
-border-radius:15px;
+        width: 200px;
 
-box-shadow:0 5px 15px rgba(0, 0, 0, 0.66);
-
-}
-
-
-
-.class-card{
-
-transition:.4s;
-
-}
+    }
 
 
+    .menu-btn {
 
-.class-card:hover{
+        width: 38px;
 
-transform:translateY(-5px);
+        height: 38px;
+
+        font-size: 21px;
+
+    }
 
 }
-
-
-
-.profile-img{
-
-width:30px;
-
-height:30px;
-
-border-radius:50%;
-
-object-fit:cover;
-
-}
-
-
-
-.big-profile{
-
-width:90px;
-
-height:90px;
-
-border-radius:50%;
-
-object-fit:cover;
-
-}
-
-.profile-button{
-
-width:45px;
-height:45px;
-padding:0;
-border-radius:50%;
-overflow:hidden;
-border:1px solid #ddd;
-background:white;
-display:flex;
-align-items:center;
-justify-content:center;
-
-}
-
-
-.profile-img{
-
-width:55px;
-height:55px;
-border-radius:50%;
-object-fit:cover;
-
-}
-
 
 </style>
 
@@ -613,6 +1028,24 @@ Add Student
 
 
 </a>
+
+</li>
+
+
+
+
+<li>
+
+    <a
+        class="dropdown-item"
+        href="teacher_admin_classes.php?teacher_class_id=<?php echo (int)$class_id; ?>"
+    >
+
+        <i class="fa-solid fa-user-plus text-success"></i>
+
+        Add From Admin
+
+    </a>
 
 </li>
 
