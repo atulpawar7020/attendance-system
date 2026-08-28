@@ -1041,7 +1041,7 @@ Add Student
         href="teacher_admin_classes.php?teacher_class_id=<?php echo (int)$class_id; ?>"
     >
 
-        <i class="fa-solid fa-user-plus text-success"></i>
+        <i class="fa fa-user-plus"></i>
 
         Add From Admin
 

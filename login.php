@@ -173,6 +173,32 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
 
 <style>
 
+/* ================================
+   LOGIN PAGE POSITION FIX
+================================ */
+
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+/* Login box ko thoda neeche */
+.container {
+    transform: translateY(10px) !important;
+}
+
+
+
+
+
 .password-box {
 
     position: relative;
