@@ -272,19 +272,28 @@ body {
 
             <br><br>
 
-            ✔ Manage Classes
+            ✓ Admin & Teacher Access
 
             <br>
 
-            ✔ Track Attendance
+
+            ✓ Easy Class Management
 
             <br>
 
-            ✔ Generate Reports
+            ✓ Quick Student Management
 
             <br>
 
-            ✔ Student Registration
+            ✓ Fast Attendance Tracking
+
+            <br>
+
+            ✓ Accurate Attendance Records
+
+            <br>
+
+            ✓ Easy Reports
 
         </p>
 
