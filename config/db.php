@@ -1,28 +1,18 @@
 <?php
+// Get database credentials from environment variables
+$host = getenv('DB_HOST') ?: 'localhost';
+$user = getenv('DB_USER') ?: 'root';
+$pass = getenv('DB_PASSWORD') ?: '';
+$db   = getenv('DB_NAME') ?: 'attendance_db';
 
-if ($_SERVER['SERVER_NAME'] == "localhost") {
+// Create connection
+$conn = mysqli_connect($host, $user, $pass, $db);
 
-    $conn = mysqli_connect(
-        "localhost",
-        "root",
-        "",
-        "attendance_db"
-    );
-
-} else {
-
-    $conn = mysqli_connect(
-        "sql203.infinityfree.com",
-        "if0_42566807",
-        "Atul9940",
-        "if0_42566807_attendance_db"
-    );
-}
-
+// Check connection
 if (!$conn) {
     die("Database Connection Failed: " . mysqli_connect_error());
 }
 
+// Set charset
 mysqli_set_charset($conn, "utf8mb4");
-
 ?>

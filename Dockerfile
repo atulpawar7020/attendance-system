@@ -13,12 +13,12 @@ WORKDIR /var/www/html
 # Copy all project files
 COPY . .
 
-# Set proper permissions (but DO NOT change user/group)
+# Set proper permissions (owner: www-data, group: www-data)
 RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 755 /var/www/html
 
-# Expose port 80
+# ✅ Expose port 80
 EXPOSE 80
 
-# Start Apache in foreground
+# ✅ Start Apache in foreground
 CMD ["apache2-foreground"]
