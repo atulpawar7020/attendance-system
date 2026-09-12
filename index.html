@@ -1,0 +1,10 @@
+<?php
+
+if (file_exists('login.php')) {
+    include 'login.php';
+} else {
+    // अगर login.php न मिले, तो एक डिफ़ॉल्ट मैसेज दिखाएं
+    echo "<h1>❌ login.php नहीं मिली!</h1>";
+    echo "<p>कृपया सुनिश्चित करें कि <code>login.php</code> फाइल <code>htdocs</code> फोल्डर में मौजूद है।</p>";
+}
+?>
